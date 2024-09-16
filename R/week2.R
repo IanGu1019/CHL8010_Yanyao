@@ -7,3 +7,4 @@ data %>%
                values_to = "MatMor") -> data1
 data1$Year <- as.numeric(data1$Year)
 write_csv(data1,"data/data.csv")
+data1
