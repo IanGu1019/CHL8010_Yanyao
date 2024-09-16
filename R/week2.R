@@ -10,4 +10,4 @@ write_csv(data1,"data/data.csv")
 
 library(usethis)
 usethis::use_git_config(user.name = "IanGu1019", user.email = "yanyaogu@gmail.com")
-use_git()
+use_github()
