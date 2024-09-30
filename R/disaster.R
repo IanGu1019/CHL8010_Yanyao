@@ -6,5 +6,6 @@ disaster %>% filter(Year>=2000 & Year<=2019) %>%
 disaster$drought <- ifelse(disaster$`Disaster Type`=="Drought",1,0)
 disaster$earthquake <- ifelse(disaster$`Disaster Type`=="Earthquake",1,0)
 disaster %>% group_by(year,ISO) %>% 
-  summarize(drought=max(drought),earthquake=max(earthquake))->disaster
+  summarize(drought=max(drought),earthquake=max(earthquake)) %>% 
+  ungroup()->disaster
 write_csv(disaster,"data/disaster.csv")
