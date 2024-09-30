@@ -1,4 +1,3 @@
-library(readr)
 library(tidyverse)
 maternal <- read_csv("original/maternalmortality.csv")
 infant <- read_csv("original/infantmortality.csv")
@@ -8,9 +7,9 @@ under5 <- read_csv("original/under5mortality.csv")
 modifydata <- function(x){
   name <- deparse(substitute(x))
   x %>% select(`Country Name`, "2000":"2019") %>% 
-    pivot_longer("2000":"2019",names_to = "Year", 
+    pivot_longer("2000":"2019",names_to = "year", 
                  values_to = paste0(name,"Mor")) -> x
-  x$Year <- as.numeric(x$Year)
+  x$year <- as.numeric(x$year)
   return(x)
 }
 
@@ -20,7 +19,7 @@ neonatal_mod <- modifydata(neonatal)
 under5_mod <- modifydata(under5)
 
 allmor <- reduce(list(maternal_mod, infant_mod, neonatal_mod, under5_mod), 
-                 full_join, by = c("Country Name", "Year"))
+                 full_join, by = c("Country Name", "year"))
 
 library(countrycode)
 allmor$ISO <- countrycode(allmor$`Country Name`,
