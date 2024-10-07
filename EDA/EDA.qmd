@@ -1,0 +1,69 @@
+---
+title: "EDA"
+format: pdf
+editor: visual
+author: Yanyao Gu
+---
+
+## Read in Data
+
+```{r}
+library(tidyverse)
+library(here)
+data <- read_csv(here("data", "merged.csv"))
+```
+
+## Quick Look at Data
+
+First look at the top lines.
+
+```{r}
+data %>% head()
+```
+
+Then the bottom lines
+
+```{r}
+data %>% tail()
+```
+
+Now randomly select a few lines
+
+```{r}
+data %>% slice_sample(n = 6)
+```
+
+Check the class of all variables
+
+```{r}
+data %>% glimpse()
+```
+
+And let's see some basic statistics of the variables
+
+```{r}
+data %>% summary()
+```
+
+## Mortality Trend
+
+```{r,warning=FALSE}
+data |>
+  ggplot(aes(x = year, y = neonatalMor, group = ISO)) +
+  geom_line(color = "skyblue") +
+  xlim(c(2000,2019)) +
+  labs(y = "Neonatal mortality", x = "Year") + 
+  theme_bw()
+```
+
+## Mortality Trend by OECD
+
+```{r,warning=FALSE}
+data |>
+  ggplot(aes(x = year, y = maternalMor, group = ISO)) +
+  geom_line(aes(color = as.factor(conflict)), alpha = 0.5) +
+  xlim(c(2000,2019)) +
+  scale_y_continuous(trans='log10') + 
+  labs(y = "Maternal mortality", x = "Year", color = "Armed conflict") + 
+  theme_bw()
+```
