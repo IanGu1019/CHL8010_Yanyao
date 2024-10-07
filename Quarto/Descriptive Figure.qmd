@@ -1,0 +1,19 @@
+---
+title: "Descriptive Figure"
+format: pdf
+editor: visual
+author: Yanyao Gu
+---
+
+## Packages
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+## Read in data
+
+```{r}
+data <- read_csv(here("data","merged.csv"))
+```

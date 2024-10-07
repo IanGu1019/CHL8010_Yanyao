@@ -8,14 +8,17 @@ author: Yanyao Gu
 ## Packages
 
 ```{r}
+#| output: false
 library(tidyverse)
+library(here)
 library(table1)
 ```
 
 ## Read in data
 
 ```{r}
-data <- read_csv("data/merged.csv")
+#| output: false
+data <- read_csv(here("data","merged.csv"))
 ```
 
 ## Create table1
@@ -30,5 +33,6 @@ data$drought <- factor(data$drought, levels = c(1,0),
 data$earthquake <- factor(data$earthquake, levels = c(1,0),
                         labels = c("Earthquake","No Earthquake"))
 
-table1(~maternalMor+infantMor+neonatalMor+under5Mor+drought+earthquake+death+gdp1000|conflict,data)
+table1(~maternalMor+infantMor+neonatalMor+under5Mor
+       +drought+earthquake+death+gdp1000|conflict,data)
 ```
