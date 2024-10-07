@@ -1,0 +1,34 @@
+---
+title: "Table1"
+format: pdf
+editor: visual
+author: Yanyao Gu
+---
+
+## Packages
+
+```{r}
+library(tidyverse)
+library(table1)
+```
+
+## Read in data
+
+```{r}
+data <- read_csv("data/merged.csv")
+```
+
+## Create table1
+
+```{r}
+data$conflict <- factor(data$conflict, levels = c(1,0),
+                        labels = c("Conflict","No Conflict"))
+
+data$drought <- factor(data$drought, levels = c(1,0),
+                        labels = c("Drought","No Drought"))
+
+data$earthquake <- factor(data$earthquake, levels = c(1,0),
+                        labels = c("Earthquake","No Earthquake"))
+
+table1(~maternalMor+infantMor+neonatalMor+under5Mor+drought+earthquake+death+gdp1000|conflict,data)
+```
