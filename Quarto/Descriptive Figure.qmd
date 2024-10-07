@@ -17,3 +17,31 @@ library(here)
 ```{r}
 data <- read_csv(here("data","merged.csv"))
 ```
+
+## Figure
+
+```{r}
+data |>
+  dplyr::select(country_name, ISO, year, maternalMor) |>
+  dplyr::filter(year < 2018) |>
+  arrange(ISO, year) |>
+  group_by(ISO) |>
+  mutate(diffmatmor = maternalMor - maternalMor[1L]) |>
+  filter(year==2017&diffmatmor>0)|>
+  select(ISO) -> ISO_increase
+ISO_increase <- ISO_increase$ISO
+
+data |>
+  dplyr::select(country_name, ISO, year, maternalMor) |>
+  dplyr::filter(year < 2018) |>
+  arrange(ISO, year) |>
+  group_by(ISO) |>
+  mutate(diffmatmor = maternalMor - maternalMor[1L]) |>
+  filter(ISO == ISO_increase) |>
+  ggplot(aes(x = year, y = maternalMor, group = ISO)) +
+  geom_line(aes(color = ISO), alpha = 0.5) +
+  xlim(c(2000,2017)) +
+  scale_y_continuous(trans='log10')+
+  labs(y = "Maternal mortality", x = "Year") + 
+  theme_bw()
+```
