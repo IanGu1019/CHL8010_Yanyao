@@ -1,0 +1,45 @@
+---
+title: "EDA"
+format: pdf
+editor: visual
+author: Yanyao Gu
+---
+
+## Read in Data
+
+```{r}
+library(tidyverse)
+data <- read_csv("data/merged.csv")
+```
+
+## Quick Look at Data
+
+First look at the top lines.
+
+```{r}
+data %>% head()
+```
+
+Then the bottom lines
+
+```{r}
+data %>% tail()
+```
+
+Now randomly select a few lines
+
+```{r}
+data %>% slice_sample(n = 6)
+```
+
+Check the class of all variables
+
+```{r}
+data %>% glimpse()
+```
+
+And let's see some basic statistics of the variables
+
+```{r}
+data %>% summary()
+```
