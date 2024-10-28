@@ -1,0 +1,39 @@
+---
+title: "models_and_coefficients"
+format: pdf
+editor: visual
+author: Yanyao Gu
+---
+
+## Packages
+
+```{r}
+#| output: false
+library(tidyverse)
+library(plm)
+library(here)
+library(texreg)
+```
+
+## Fitting models and output coefficients
+
+```{r}
+merged <- read_csv(here("data","merged.csv"))
+merged %>% mutate(lgdp1000=log(gdp1000)) -> merged
+
+preds <- as.formula(" ~ conflict + lgdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought")
+
+matmormod <- plm(update.formula(preds, maternalMor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = merged)
+un5mormod <- plm(update.formula(preds, under5Mor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = merged)
+infmormod <- plm(update.formula(preds, infantMor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = merged)
+neomormod <- plm(update.formula(preds, neonatalMor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = merged)
+
+coefs <- screenreg(list(matmormod,un5mormod,infmormod,neomormod),
+                   custom.model.names = c("matmor","un5mor","infmor","neomor"))
+coefs
+```
