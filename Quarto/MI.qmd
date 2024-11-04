@@ -1,0 +1,93 @@
+---
+title: "MI"
+author: "Yanyao Gu"
+format: pdf
+editor: visual
+---
+
+## Packages
+
+```{r}
+library(tidyverse)
+library(here)
+library(mice)
+library(plm)
+library(texreg)
+```
+
+## Read in data
+
+```{r}
+data <- read_csv(here("data","merged.csv"))
+```
+
+## MI
+
+```{r}
+set.seed(1006742018)
+midata <- data |>
+  mutate(ISOnum = as.numeric(as.factor(data$ISO))) |>
+  select(-country_name, -ISO)
+
+mice0  <- mice(midata, seed = 100, m = 5, maxit = 0, print = F)
+
+meth <- mice0$method
+meth[c("urban", "male_edu", "temp", "rainfall1000", "maternalMor", "infantMor", 
+       "neonatalMor", "under5Mor", "lgdp1000", "popdens")] <- "2l.lmer"
+
+pred <- mice0$predictorMatrix
+pred[c("urban", "male_edu", "temp", "rainfall1000", "maternalMor", "infantMor", 
+       "neonatalMor", "under5Mor", "lgdp1000", "popdens"), "ISOnum"] <- -2
+
+mice.multi.out  <- mice(midata, seed = 100, m = 10, maxit = 20,
+                        method = meth,
+                        predictorMatrix = pred)
+
+plot(mice.multi.out)
+```
+
+## Fit models
+
+```{r}
+maternal.fit <- with(mice.multi.out, glm(maternalMor~conflict + lgdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought, family = gaussian))
+out.maternal <- pool(maternal.fit)
+summary(out.maternal)
+
+infant.fit <- with(mice.multi.out, glm(infantMor~conflict + lgdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought, family = gaussian))
+out.infant <- pool(infant.fit)
+summary(out.infant)
+
+neonatal.fit <- with(mice.multi.out, glm(neonatalMor~conflict + lgdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought, family = gaussian))
+out.neonatal <- pool(neonatal.fit)
+summary(out.neonatal)
+
+under5.fit <- with(mice.multi.out, glm(under5Mor~conflict + lgdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought, family = gaussian))
+out.under5 <- pool(under5.fit)
+summary(out.under5)
+```
+
+## Coefficients table
+
+```{r}
+preds <- as.formula(" ~ conflict + lgdp1000 + OECD + popdens + urban + 
+                  agedep + male_edu + temp + rainfall1000 + earthquake + drought")
+
+matmormod <- plm(update.formula(preds, maternalMor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = data)
+un5mormod <- plm(update.formula(preds, under5Mor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = data)
+infmormod <- plm(update.formula(preds, infantMor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = data)
+neomormod <- plm(update.formula(preds, neonatalMor ~ .),index = c("ISO","year"),
+                 effect = "twoways", model = "within", data = data)
+
+coefs <- screenreg(list(matmormod,out.maternal,un5mormod,out.under5,
+                        infmormod,out.infant,neomormod,out.neonatal),
+                   custom.model.names = c("matmor","matmor.mi","un5mor","un5mor.mi",
+                                          "infmor","infmor.mi","neomor","neomor.mi"))
+coefs
+```

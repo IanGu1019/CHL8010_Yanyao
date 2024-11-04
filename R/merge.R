@@ -10,5 +10,6 @@ merged <- left_join(covariates, merged, by = c("ISO", "year"))
 merged %>% mutate(conflict = replace_na(conflict, 0),
                   drought = replace_na(drought, 0),
                   earthquake = replace_na(earthquake, 0),
-                  death = replace_na(death, 0)) -> merged
+                  death = replace_na(death, 0),
+                  lgdp1000 = log(gdp1000)) -> merged
 write_csv(merged,"data/merged.csv")
